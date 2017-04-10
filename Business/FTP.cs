@@ -8,13 +8,29 @@ using System.Threading.Tasks;
 
 namespace FtpDownloader.Business
 {
+    /// <summary>
+    /// FTP class where it contais connection methods and file management.
+    /// </summary>
     class FTP
     {
+        #region VARIABLES
+
+        /// <summary>
+        /// Struct for every file or directory.
+        /// </summary>
         public struct ftplist
         {
+            /// <summary>
+            /// Type, it can be either "-" for file or "d" for directory.
+            /// </summary>
             public string type { get; set; }
+            /// <summary>
+            /// Filename.
+            /// </summary>
             public string filename { get; set; }
         }
+
+        #endregion
 
         #region CONNECTION STUFF
 
@@ -42,7 +58,7 @@ namespace FtpDownloader.Business
         }
 
         /// <summary>
-        /// Function that try to connect to the FTP
+        /// Function that try to connect to the FTP.
         /// </summary>
         /// <param name="s">Settings </param>
         /// <param name="keepAlive">Request value, keep it TRUE.</param>
@@ -50,11 +66,14 @@ namespace FtpDownloader.Business
         {
             try
             {
+                /// Creates FtpWebRequest.
                 FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
+
+                /// Method is set to ListDirectoryDetails.
                 request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
+                /// Make the call to the FTP.
                 request.GetResponse();
-
             }
             catch
             {
@@ -71,17 +90,19 @@ namespace FtpDownloader.Business
         /// <returns></returns>
         public FtpWebResponse GetDirectoryList(string FtpFolderPath, string FtpUsername, string FtpPassword, bool keepAlive = false)
         {
+            /// Creates FtpWebRequest.
             FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
-            request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
+            /// Method is set to ListDirectoryDetails.
+            request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
             try
             {
+                /// Return the response.
                 return (FtpWebResponse)request.GetResponse();
 
             }
             catch (Exception)
             {
-
                 throw new Exception();
             }
         }
@@ -90,10 +111,18 @@ namespace FtpDownloader.Business
 
         #region FTP FILE MANAGEMENT
 
-        //public void DownloadFile(string username, string password, string filename, string FTPSourceFilePath, string localDestinationFilePath, bool DeleteFileAfterDownload, bool WriteLogAfterDownload, Data.Settings s)
+        /// <summary>
+        /// Method that downloads a file from a FTP.
+        /// </summary>
+        /// <param name="FtpFolderPath">Path to file/directory in FTP.</param>
+        /// <param name="FtpUsername">Ftp username.</param>
+        /// <param name="FtpPassword">Ftp password.</param>
+        /// <param name="DownloadFolderPath">Local download path.</param>
+        /// <param name="UrlEncodedTorrent">Encoded URL, necessary to download.</param>
+        /// <param name="filename">Filename for creating the file with same name(not encoded).</param>
         public void DownloadFile(string FtpFolderPath, string FtpUsername, string FtpPassword, string DownloadFolderPath, string UrlEncodedTorrent, string filename)
         {
-
+            /// Filestream necessary values.
             int bytesRead = 0;
             byte[] buffer = new byte[2048];
 
@@ -103,13 +132,13 @@ namespace FtpDownloader.Business
 
             try
             {
-                /// Gets response from the server
+                /// Gets response from the server.
                 Stream reader = request.GetResponse().GetResponseStream();
 
-                /// Generates a file in the destination with the certain filename
+                /// Generates a file in the destination with the certain filename.
                 FileStream fileStream = new FileStream(DownloadFolderPath + filename, FileMode.Create);
 
-                /// While the file has bytes, it keeps writing on the file
+                /// While the file has bytes, it keeps writing on the file.
                 while (true)
                 {
                     bytesRead = reader.Read(buffer, 0, buffer.Length);
@@ -119,7 +148,7 @@ namespace FtpDownloader.Business
 
                     fileStream.Write(buffer, 0, bytesRead);
                 }
-
+                /// Close the file.
                 fileStream.Close();
             }
             catch (Exception e)
@@ -138,7 +167,7 @@ namespace FtpDownloader.Business
         }
 
         /// <summary>
-        /// Method that deletes file on FTP server
+        /// Method that deletes file on FTP server.
         /// </summary>
         /// <param name="r">FtpWebRequest, it contais entire data like path and filename.</param>
         public void DeleteFileOnFtpServer(FtpWebRequest r)
@@ -167,25 +196,28 @@ namespace FtpDownloader.Business
         #region GET FTP FILE LIST
 
         /// <summary>
-        /// Reads entire directory for .torrents
+        /// Reads entire directory for .torrents.
         /// </summary>
-        /// <param name="s">Settings</param>
+        /// <param name="s">Settings.</param>
         /// <returns></returns>
         public List<ftplist> GetFileList(string FtpFolderPath, string FtpUsername, string FtpPassword)
         {
+            /// Set the sourceFileList to return, is a list of ftplist, the struct generated at the beginning.
             List<ftplist> sourceFileList = new List<ftplist>();
             string line = "";
-            /// Creates entire Response 
             try
             {
+                /// Build the response and return it to this method.
                 FtpWebResponse sourceResponse = GetDirectoryList(FtpFolderPath, FtpUsername, FtpPassword, true);
 
+                /// Do the call to the FTP.
                 using (Stream responseStream = sourceResponse.GetResponseStream())
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
                     {
-                        /// Reads the filename details
+                        /// Reads the filename details.
                         line = reader.ReadLine();
+                        /// While the line is not null (no more lines).
                         while (line != null)
                         {
                             try
@@ -228,12 +260,10 @@ namespace FtpDownloader.Business
             {
                 throw new Exception();
             }
-            //Creates a list(fileList) of the file names
-
+            /// Return the list of ftlist struct.
             return sourceFileList;
         }
 
         #endregion
-
     }
 }
