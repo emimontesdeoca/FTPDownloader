@@ -74,7 +74,16 @@ namespace FtpDownloader.Business
             FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
-            return (FtpWebResponse)request.GetResponse();
+            try
+            {
+                return (FtpWebResponse)request.GetResponse();
+
+            }
+            catch (Exception)
+            {
+
+                throw new Exception();
+            }
         }
 
         #endregion
@@ -167,51 +176,60 @@ namespace FtpDownloader.Business
             List<ftplist> sourceFileList = new List<ftplist>();
             string line = "";
             /// Creates entire Response 
-            FtpWebResponse sourceResponse = GetDirectoryList(FtpFolderPath, FtpUsername, FtpPassword, true);
-            //Creates a list(fileList) of the file names
-            using (Stream responseStream = sourceResponse.GetResponseStream())
+            try
             {
-                using (StreamReader reader = new StreamReader(responseStream))
+                FtpWebResponse sourceResponse = GetDirectoryList(FtpFolderPath, FtpUsername, FtpPassword, true);
+
+                using (Stream responseStream = sourceResponse.GetResponseStream())
                 {
-                    /// Reads the filename details
-                    line = reader.ReadLine();
-                    while (line != null)
+                    using (StreamReader reader = new StreamReader(responseStream))
                     {
-                        try
+                        /// Reads the filename details
+                        line = reader.ReadLine();
+                        while (line != null)
                         {
-                            /// Split it by spaces.
-                            string[] newfilename = line.Split(' ');
-                            /// Split it by ":", gives 2 string array.
-                            string[] fullfilename = line.Split(':');
-                            /// Delete 3 first characters because of yes.
-                            string finalfilename = fullfilename[1].Remove(0, 3).ToString();
                             try
                             {
-                                /// If last is not torrent, does nothing
-                                if (newfilename.Last() == "." || newfilename.Last() == "..")
+                                /// Split it by spaces.
+                                string[] newfilename = line.Split(' ');
+                                /// Split it by ":", gives 2 string array.
+                                string[] fullfilename = line.Split(':');
+                                /// Delete 3 first characters because of yes.
+                                string finalfilename = fullfilename[1].Remove(0, 3).ToString();
+                                try
                                 {
-                                }
-                                else /// Add it to the list
-                                {
-                                    ftplist newitem = new ftplist()
+                                    /// If last is not torrent, does nothing
+                                    if (newfilename.Last() == "." || newfilename.Last() == "..")
                                     {
-                                        type = line.Substring(0, 1),
-                                        filename = finalfilename
-                                    };
-                                    sourceFileList.Add(newitem);
+                                    }
+                                    else /// Add it to the list
+                                    {
+                                        ftplist newitem = new ftplist()
+                                        {
+                                            type = line.Substring(0, 1),
+                                            filename = finalfilename
+                                        };
+                                        sourceFileList.Add(newitem);
+                                    }
+                                }
+                                catch (Exception)
+                                {
                                 }
                             }
                             catch (Exception)
                             {
                             }
+                            line = reader.ReadLine();
                         }
-                        catch (Exception)
-                        {
-                        }
-                        line = reader.ReadLine();
                     }
                 }
             }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+            //Creates a list(fileList) of the file names
+
             return sourceFileList;
         }
 
