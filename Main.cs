@@ -73,8 +73,10 @@ namespace FtpDownloader
         private void btn_selectpath_Click(object sender, EventArgs e)
         {
             /// Instance a FolderBrowserDialog.
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            fbd.Description = "In other to make sure that the download has no problems, the folder has to have writing and reading rights for everyone.";
+            FolderBrowserDialog fbd = new FolderBrowserDialog()
+            {
+                Description = "In other to make sure that the download has no problems, the folder has to have writing and reading rights for everyone."
+            };
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 /// Set the textbox with the selectedpath.
@@ -113,6 +115,7 @@ namespace FtpDownloader
             }
             catch (Exception)
             {
+                progressBar1.Value = 0;
                 MessageBox.Show("FTP timeout, retry again!");
             }
 
@@ -150,44 +153,44 @@ namespace FtpDownloader
             {
                 /// Get the struct list of files with its type ("d" for directory || "-" for file).
                 /// This is going to download the files first since it is ordered to do it!
-                List<Business.FTP.ftplist> ftpdirectory = new Business.FTP().GetFileList(path, textbox_username.Text, textbox_password.Text).OrderBy(o => o.type).ToList();
+                List<Business.FTP.Ftplist> ftpdirectory = new Business.FTP().GetFileList(path, textbox_username.Text, textbox_password.Text).OrderBy(o => o.Type).ToList();
                 /// Since we know how many files there are, lets increment the ProgressBar.
                 progressBar1.Increment(ftpdirectory.Count);
 
-                foreach (Business.FTP.ftplist item in ftpdirectory)
+                foreach (Business.FTP.Ftplist item in ftpdirectory)
                 {
                     /// If the file/directory is actually a directory and it does NOT exist in our download PATH.
-                    if (item.type == "d" && !Directory.Exists(localpath + item.filename + "\\"))
+                    if (item.Type == "d" && !Directory.Exists(localpath + item.Filename + "\\"))
                     {
                         /// If there is a directory, lets create it.
-                        new Business.Local().CreateDirectory(localpath, item.filename);
+                        new Business.Local().CreateDirectory(localpath, item.Filename);
 
                         /// Now lets get the filetree of the directory that we just created (filetree in the FTP not in the PATH).
                         /// This is going to download the files first since it is ordered to do it!
-                        List<Business.FTP.ftplist> newftpdirectory = new Business.FTP().GetFileList(path + item.filename + "/", textbox_username.Text, textbox_password.Text).OrderBy(o => o.type).ToList();
+                        List<Business.FTP.Ftplist> newftpdirectory = new Business.FTP().GetFileList(path + item.Filename + "/", textbox_username.Text, textbox_password.Text).OrderBy(o => o.Type).ToList();
 
                         /// Since we know the filetree now, lets download the files and create the folders.
-                        foreach (Business.FTP.ftplist newitem in newftpdirectory)
+                        foreach (Business.FTP.Ftplist newitem in newftpdirectory)
                         {
                             /// If the file/directory is a directory, and it does not exist in our PATH.
-                            if (newitem.type == "d" && !Directory.Exists(localpath + item.filename + "\\" + newitem.filename + "\\"))
+                            if (newitem.Type == "d" && !Directory.Exists(localpath + item.Filename + "\\" + newitem.Filename + "\\"))
                             {
                                 /// It calls this same method to do it again but giving it this current FTP path and LOCAL path.
-                                DownloadInside(path + item.filename + "/", localpath + item.filename + "\\");
+                                DownloadInside(path + item.Filename + "/", localpath + item.Filename + "\\");
                             }
                             /// If it is a file and already exist
-                            else if (File.Exists(localpath + item.filename + "\\" + newitem.filename))
+                            else if (File.Exists(localpath + item.Filename + "\\" + newitem.Filename))
                             {
                                 /// Do nothing.
                             }
                             /// And if it is not a file that exist and it is not a directory that existe, then it is a file that we have to download
-                            else if (!Directory.Exists(localpath + item.filename + "\\" + newitem.filename + "\\") && !File.Exists(localpath + item.filename + "\\" + newitem.filename))
+                            else if (!Directory.Exists(localpath + item.Filename + "\\" + newitem.Filename + "\\") && !File.Exists(localpath + item.Filename + "\\" + newitem.Filename))
                             {
                                 /// Encode it to URL for the FTP download.
-                                string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(newitem.filename).Replace("+", "%20");
+                                string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(newitem.Filename).Replace("+", "%20");
 
                                 /// Download it.
-                                new Business.FTP().DownloadFile(path + item.filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.filename + "\\", UrlEncodedFilename, newitem.filename);
+                                new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename);
                             }
                             /// Add 1 to progress bar.
                             try
@@ -202,19 +205,18 @@ namespace FtpDownloader
                         }
                     }
                     /// I the file/directory already exist
-                    else if (File.Exists(localpath + item.filename))
+                    else if (File.Exists(localpath + item.Filename))
                     {
                         /// Obviously it does nothing.
                     }
                     /// It does not exist and it is not a directory, so is a file -> download it.
                     else
                     {
-                        /// Split the path.
-                        string[] newpath = path.Split('/');
+                        
                         /// Encode it to URL for the FTP download.
-                        string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(item.filename).Replace("+", "%20");
+                        string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(item.Filename).Replace("+", "%20");
                         /// Download it.
-                        new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.filename);
+                        new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename);
                     }
                     /// Add 1 to progress bar.
                     try

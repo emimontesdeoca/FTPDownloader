@@ -15,19 +15,21 @@ namespace FtpDownloader.Business
     {
         #region VARIABLES
 
+        public static FtpWebRequest request;
+
         /// <summary>
         /// Struct for every file or directory.
         /// </summary>
-        public struct ftplist
+        public struct Ftplist
         {
             /// <summary>
             /// Type, it can be either "-" for file or "d" for directory.
             /// </summary>
-            public string type { get; set; }
+            public string Type { get; set; }
             /// <summary>
             /// Filename.
             /// </summary>
-            public string filename { get; set; }
+            public string Filename { get; set; }
         }
 
         #endregion
@@ -44,7 +46,10 @@ namespace FtpDownloader.Business
         /// <returns></returns>
         public FtpWebRequest CreateFtpWebRequest(string FTPDirectoryPath, string username, string password, bool keepAlive = false)
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri(FTPDirectoryPath));
+            /// Clean the request, just in case.
+            request = null;
+
+            request = (FtpWebRequest)WebRequest.Create(new Uri(FTPDirectoryPath));
 
             request.Proxy = null;
 
@@ -66,8 +71,9 @@ namespace FtpDownloader.Business
         {
             try
             {
+                request = null;
                 /// Creates FtpWebRequest.
-                FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
+                request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
 
                 /// Method is set to ListDirectoryDetails.
                 request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -91,13 +97,16 @@ namespace FtpDownloader.Business
         public FtpWebResponse GetDirectoryList(string FtpFolderPath, string FtpUsername, string FtpPassword, bool keepAlive = false)
         {
             /// Creates FtpWebRequest.
-            FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
+
+            request = null;
+
+            request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
 
             /// Method is set to ListDirectoryDetails.
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
             try
             {
-                /// Return the response.
+                /// Return the response, try 3 times to do it.
                 return (FtpWebResponse)request.GetResponse();
 
             }
@@ -126,8 +135,11 @@ namespace FtpDownloader.Business
             int bytesRead = 0;
             byte[] buffer = new byte[2048];
 
+            /// Clean the request, I hate this fucking shit.
+            request = null;
+
             /// Creates request and assigns it to the request.
-            FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath + UrlEncodedTorrent, FtpUsername, FtpPassword, true);
+            request = CreateFtpWebRequest(FtpFolderPath + UrlEncodedTorrent, FtpUsername, FtpPassword, true);
             request.Method = WebRequestMethods.Ftp.DownloadFile;
 
             try
@@ -157,40 +169,6 @@ namespace FtpDownloader.Business
             }
         }
 
-        public void CreateDirectory(string FtpFolderPath, string FtpUsername, string FtpPassword, string DirectoryName)
-        {
-
-            /// Creates request and assigns it to the request.
-            FtpWebRequest request = CreateFtpWebRequest(FtpFolderPath + DirectoryName, FtpUsername, FtpPassword, true);
-            request.Method = WebRequestMethods.Ftp.MakeDirectory;
-            request.GetResponse();
-        }
-
-        /// <summary>
-        /// Method that deletes file on FTP server.
-        /// </summary>
-        /// <param name="r">FtpWebRequest, it contais entire data like path and filename.</param>
-        public void DeleteFileOnFtpServer(FtpWebRequest r)
-        {
-            /// Make the request.
-            FtpWebRequest request = r;
-
-            /// Set the method.
-            request.Method = WebRequestMethods.Ftp.DeleteFile;
-
-            try
-            {
-                /// Try to do the request on the FTP.
-                FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-                response.Close();
-
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
-
         #endregion
 
         #region GET FTP FILE LIST
@@ -200,10 +178,10 @@ namespace FtpDownloader.Business
         /// </summary>
         /// <param name="s">Settings.</param>
         /// <returns></returns>
-        public List<ftplist> GetFileList(string FtpFolderPath, string FtpUsername, string FtpPassword)
+        public List<Ftplist> GetFileList(string FtpFolderPath, string FtpUsername, string FtpPassword)
         {
             /// Set the sourceFileList to return, is a list of ftplist, the struct generated at the beginning.
-            List<ftplist> sourceFileList = new List<ftplist>();
+            List<Ftplist> sourceFileList = new List<Ftplist>();
             string line = "";
             try
             {
@@ -224,34 +202,51 @@ namespace FtpDownloader.Business
                             {
                                 /// Split it by spaces.
                                 string[] newfilename = line.Split(' ');
-                                /// Split it by ":", gives 2 string array.
-                                string[] fullfilename = line.Split(':');
-                                /// Delete 3 first characters because of yes.
-                                string finalfilename = fullfilename[1].Remove(0, 3).ToString();
+                                /// Get filename.
+                                string finalfilename = newfilename.Last();
                                 try
                                 {
-                                    /// If last is not torrent, does nothing
-                                    if (newfilename.Last() == "." || newfilename.Last() == "..")
+                                    /// If it is not "." or ".." or it is not a file without name(windows) and not a directory.
+                                    if (newfilename.Last() == "." || newfilename.Last() == ".." || finalfilename.Substring(0, 1) == "." && line.Substring(0, 1) != "d")
                                     {
                                     }
-                                    else /// Add it to the list
+                                    else /// Add it to the list.
                                     {
-                                        ftplist newitem = new ftplist()
+                                        /// Lets get the type of file or directory.
+                                        /// How the ListDirectoryDetails works is different for each operative system.
+                                        /// To explain this lets see what does a ls -a shows when you do it: -rw-r--r--. 1 root root   683 Aug 19 09:59 0001.pcap
+                                        /// As you can see the first letter is either - or d, now lets see how dir works in Windows: 11/30/2004  01:40 PM <DIR> ..
+                                        /// They are quite different so you have to get what is what in each string.
+
+                                        Ftplist newitem = new Ftplist();
+                                        /// If ftp is LINUX based
+                                        if ((line.Substring(0, 1) == "d" || line.Substring(0, 1) == "-") && newfilename[9] != "<DIR>")
                                         {
-                                            type = line.Substring(0, 1),
-                                            filename = finalfilename
-                                        };
+                                            newitem.Type = line.Substring(0, 1);
+                                        }
+                                        /// If ftp is WINDOWS based.
+                                        else if (newfilename[9] == "<DIR>")
+                                        {
+                                            newitem.Type = "d";
+                                        }
+                                        /// Filename is the same in both environments.
+                                        else
+                                        {
+                                            newitem.Type = "-";
+                                        }
+                                        newitem.Filename = finalfilename;
                                         sourceFileList.Add(newitem);
                                     }
                                 }
                                 catch (Exception)
                                 {
                                 }
+                                /// Read another line (file or directory).
+                                line = reader.ReadLine();
                             }
                             catch (Exception)
                             {
                             }
-                            line = reader.ReadLine();
                         }
                     }
                 }
