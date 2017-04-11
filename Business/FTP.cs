@@ -129,7 +129,7 @@ namespace FtpDownloader.Business
         /// <param name="DownloadFolderPath">Local download path.</param>
         /// <param name="UrlEncodedTorrent">Encoded URL, necessary to download.</param>
         /// <param name="filename">Filename for creating the file with same name(not encoded).</param>
-        public void DownloadFile(string FtpFolderPath, string FtpUsername, string FtpPassword, string DownloadFolderPath, string UrlEncodedTorrent, string filename)
+        public void DownloadFile(string FtpFolderPath, string FtpUsername, string FtpPassword, string DownloadFolderPath, string UrlEncodedTorrent, string filename, string rootDownloadFolderPath)
         {
             /// Filestream necessary values.
             int bytesRead = 0;
@@ -162,6 +162,8 @@ namespace FtpDownloader.Business
                 }
                 /// Close the file.
                 fileStream.Close();
+                /// Create log
+                new Business.Log().WriteLog(FtpFolderPath + UrlEncodedTorrent, DownloadFolderPath + filename, rootDownloadFolderPath);
             }
             catch (Exception e)
             {

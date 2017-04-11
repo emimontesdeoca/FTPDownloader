@@ -13,6 +13,7 @@ namespace FtpDownloader
 {
     public partial class Main : Form
     {
+        public string localfilepath { get; set; }
         public Main()
         {
             InitializeComponent();
@@ -20,6 +21,7 @@ namespace FtpDownloader
 
         private void Main_Load(object sender, EventArgs e)
         {
+
         }
 
         #region BUTTON CONTROL
@@ -106,7 +108,21 @@ namespace FtpDownloader
             /// Do the download stuff.
             try
             {
-                DownloadInside(textbox_ftpserver.Text, textbox_selectedpath.Text);
+                string newdirectory = "";
+                /// Corrects the input for ftpserver.
+                if (textbox_ftpserver.Text.Substring(textbox_ftpserver.Text.Count() - 1, 1) == "/")
+                {
+                    newdirectory = textbox_ftpserver.Text.Remove(textbox_ftpserver.Text.Length, 1);
+                }
+                /// Corrects the input for ftpserver.
+                if (textbox_ftpserver.Text.Substring(0, 6) == "ftp://")
+                {
+
+                    newdirectory = newdirectory.Remove(0, 6);
+                }
+                localfilepath = textbox_selectedpath.Text + newdirectory + "\\";
+                new Business.Local().CreateDirectory(textbox_selectedpath.Text, newdirectory);
+                DownloadInside(textbox_ftpserver.Text, textbox_selectedpath.Text + newdirectory + "\\");
                 /// End progress bar.
                 progressBar1.Value = progressBar1.Maximum;
 
@@ -146,6 +162,7 @@ namespace FtpDownloader
         /// <param name="localpath">Path to local.</param>
         private void DownloadInside(string path, string localpath)
         {
+
             /// Create new list for filename string .
             List<string> directoryfiles = new List<string>();
 
@@ -164,6 +181,7 @@ namespace FtpDownloader
                     {
                         /// If there is a directory, lets create it.
                         new Business.Local().CreateDirectory(localpath, item.Filename);
+                        new Business.Log().WriteLog(path, localpath + item.Filename, localfilepath);
 
                         /// Now lets get the filetree of the directory that we just created (filetree in the FTP not in the PATH).
                         /// This is going to download the files first since it is ordered to do it!
@@ -190,7 +208,7 @@ namespace FtpDownloader
                                 string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(newitem.Filename).Replace("+", "%20");
 
                                 /// Download it.
-                                new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename);
+                                new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename, localfilepath);
                             }
                             /// Add 1 to progress bar.
                             try
@@ -212,11 +230,10 @@ namespace FtpDownloader
                     /// It does not exist and it is not a directory, so is a file -> download it.
                     else
                     {
-                        
                         /// Encode it to URL for the FTP download.
                         string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(item.Filename).Replace("+", "%20");
                         /// Download it.
-                        new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename);
+                        new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename, localfilepath);
                     }
                     /// Add 1 to progress bar.
                     try
