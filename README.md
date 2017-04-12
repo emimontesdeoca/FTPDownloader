@@ -4,7 +4,17 @@
 
 FtpDownloader is an Windows Forms application that lets you download an entire FTP(Linux or Windows based) just by entering its path and credentials.
 
-[VirusTotal](https://www.virustotal.com/en/file/343624ae7e7b28adc9cfece8f9e5d1e8a45988246307e967973f7d1b84da251a/analysis/1491870988/)
+[VirusTotal](https://www.virustotal.com/es/file/ff4a0b91c16652317fd55883f4e6b5034d9a4bff5a8b05e76fefa0221bc31935/analysis/1491967523/) for latest release.
+
+#### Version 2.0
+
+1. Support for filename/directory name with spaces (this was on the 1.0 but found a bug where sometimes it was not working as intended).
+2. Creates a folder with the ftp path.
+3. Creates a log file with all the downloads.
+4. Fixes and improvements.
+5. Now the app closes after the download.
+
+Go to [releases](https://github.com/emimontesdeoca/FtpDownloader/releases) and grab it!
 
 ## Introduction
 
