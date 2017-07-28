@@ -1,4 +1,4 @@
-# FtpDownloader [![Build Status](https://travis-ci.org/emimontesdeoca/FtpDownloader.svg?branch=master)](https://travis-ci.org/emimontesdeoca/FtpDownloader)
+# FtpDownloader [![Build Status](https://travis-ci.org/emimontesdeoca/FTPDownloader.svg?branch=master)](https://travis-ci.org/emimontesdeoca/FTPDownloader)
 
 <img src="https://i.gyazo.com/5ea90169ac5150e0868205087cae0daa.png" align="center" />
 
