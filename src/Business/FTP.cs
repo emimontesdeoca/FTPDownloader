@@ -67,7 +67,7 @@ namespace FtpDownloader.Business
         /// </summary>
         /// <param name="s">Settings </param>
         /// <param name="keepAlive">Request value, keep it TRUE.</param>
-        public void TestConnection(string FtpFolderPath, string FtpUsername, string FtpPassword, bool keepAlive = false)
+        public async Task TestConnection(string FtpFolderPath, string FtpUsername, string FtpPassword, bool keepAlive = false)
         {
             try
             {
@@ -115,6 +115,8 @@ namespace FtpDownloader.Business
                 throw new Exception();
             }
         }
+
+
 
         #endregion
 
