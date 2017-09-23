@@ -8,12 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Threading;
 
 namespace FtpDownloader
 {
     public partial class Main : Form
     {
         public string localfilepath { get; set; }
+        public CancellationTokenSource token = new CancellationTokenSource();
         public Main()
         {
             InitializeComponent();
@@ -101,13 +103,10 @@ namespace FtpDownloader
             progressBar1.Maximum = 500;
             progressBar1.Value = 0;
 
-            /// Set some style
-            btn_download.Text = "Downloading...";
-            this.Enabled = false;
-
             /// Do the download stuff.
             try
             {
+
                 string newdirectory = "";
                 /// Corrects the input for ftpserver.
                 if (textbox_ftpserver.Text.Substring(textbox_ftpserver.Text.Count() - 1, 1) == "/")
@@ -121,46 +120,86 @@ namespace FtpDownloader
                 }
                 localfilepath = textbox_selectedpath.Text + newdirectory + "\\";
                 new Business.Local().CreateDirectory(textbox_selectedpath.Text, newdirectory);
-                DownloadInside(textbox_ftpserver.Text, textbox_selectedpath.Text + newdirectory + "\\");
+                var a = DownloadInside(textbox_ftpserver.Text, textbox_selectedpath.Text + newdirectory + "\\");
                 /// End progress bar.
                 progressBar1.Value = progressBar1.Maximum;
 
                 /// If done, show something bro.
                 MessageBox.Show("Download completed!");
-                this.Close();
             }
             catch (Exception)
             {
                 progressBar1.Value = 0;
                 MessageBox.Show("FTP timeout, retry again!");
             }
-
-            /// Enable forms again and some styling.
-            this.Enabled = true;
-            btn_download.Enabled = false;
-            textbox_selectedpath.Text = "";
-            btn_download.Text = "Done!";
-
-            /// Enable FTP buttons.
-            textbox_ftpserver.Enabled = true;
-            textbox_password.Enabled = true;
-            textbox_username.Enabled = true;
-
-            /// Disable this button.
-            btn_testconnection.Enabled = true;
         }
 
         #endregion
 
         #region LOGIC
 
+        public async Task AsyncBackcraft(int interval)
+        {
+            while (!token.IsCancellationRequested)
+            {
+
+                /// Set ProgrssBar values and maximum.
+                progressBar1.Maximum = 500;
+                progressBar1.Value = 0;
+
+                /// Do the download stuff.
+                try
+                {
+                    string newdirectory = "";
+
+                    /// Corrects the input for ftpserver.
+                    if (textbox_ftpserver.Text.Substring(textbox_ftpserver.Text.Count() - 1, 1) == "/")
+                    {
+                        newdirectory = textbox_ftpserver.Text.Remove(textbox_ftpserver.Text.Length - 1, 1);
+                    }
+                    /// Corrects the input for ftpserver.
+                    if (textbox_ftpserver.Text.Substring(0, 6) == "ftp://")
+                    {
+                        newdirectory = newdirectory.Remove(0, 6);
+                    }
+
+                    localfilepath = textbox_selectedpath.Text + newdirectory + "\\";
+                    /// Create dir
+                    new Business.Local().CreateDirectory(textbox_selectedpath.Text, newdirectory);
+
+                    /// Aync task
+                    var a = DownloadInside(textbox_ftpserver.Text, textbox_selectedpath.Text + newdirectory + "\\");
+
+                    /// End progress bar.
+                    progressBar1.Value = progressBar1.Maximum;
+
+                    /// If done, show something bro.
+                    MessageBox.Show("Download completed!");
+                }
+                catch (Exception)
+                {
+                    progressBar1.Value = 0;
+                    MessageBox.Show("FTP timeout, retry again!");
+                }
+            }
+        }
+
+
         /// <summary>
         /// Method that downloads from FTP.
         /// </summary>
         /// <param name="path">Path to FTP.</param>
         /// <param name="localpath">Path to local.</param>
-        private void DownloadInside(string path, string localpath)
+        private async Task DownloadInside(string path, string localpath)
         {
+            /// Disable forms again and some styling.
+            btn_download.Enabled = false;
+
+            /// Enable FTP buttons
+            textbox_ftpserver.Enabled = false;
+            textbox_password.Enabled = false;
+            textbox_username.Enabled = false;
+
 
             /// Create new list for filename string .
             List<string> directoryfiles = new List<string>();
@@ -242,6 +281,14 @@ namespace FtpDownloader
                     progressBar1.Value = progressBar1.Maximum - 1;
                 }
             }
+
+            /// Disable forms again and some styling.
+            btn_download.Enabled = true;
+
+            /// Enable FTP buttons
+            textbox_ftpserver.Enabled = true;
+            textbox_password.Enabled = true;
+            textbox_username.Enabled = true;
         }
 
     }
