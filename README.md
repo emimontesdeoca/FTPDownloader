@@ -1,35 +1,43 @@
-# FtpDownloader [![Build Status](https://travis-ci.org/emimontesdeoca/FTPDownloader.svg?branch=master)](https://travis-ci.org/emimontesdeoca/FTPDownloader)
+<h1 align="center">FtpDownloader</h1>
 
-<img src="https://i.gyazo.com/5ea90169ac5150e0868205087cae0daa.png" align="center" />
+<p align="center">
+    <a href="https://travis-ci.com/emimontesdeoca/FTPDownloader">
+        <img src="https://travis-ci.org/emimontesdeoca/FTPDownloader.svg?branch=master"
+             alt="build status">
+    </a>
+    <a href="https://github.com/emimontesdeoca/FTPDownloade/releases">
+        <img src="https://img.shields.io/badge/version-3.0-green.svg"
+             alt="build status">
+    </a>
+    <a href="https://github.com/emimontesdeoca/FTPDownloade/releases">
+        <img src="https://img.shields.io/badge/Platform-Windows-blue.svg"
+             alt="build status">
+    </a>
+    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UBYQDM59B3GCC">
+        <img src="https://img.shields.io/badge/Donate-PayPal-green.svg"
+             alt="Donate a coffee!">
+    </a>
+    <a href="LICENSE">
+        <img src="https://img.shields.io/github/license/mashape/apistatus.svg"
+             alt="Donate a coffee!">
+    </a>
+</p>
 
-FtpDownloader is an Windows Forms application that lets you download an entire FTP(Linux or Windows based) just by entering its path and credentials.
+<p align="center"><img src="https://i.imgur.com/SUfeLAo.png" height="400px" ></p>
 
-[VirusTotal](https://www.virustotal.com/es/file/ff4a0b91c16652317fd55883f4e6b5034d9a4bff5a8b05e76fefa0221bc31935/analysis/1491967523/) for latest release.
+<p align="center">
+💻 Download an entire FTP(Linux or Windows based) by entering its path and credentials.
+</p>
 
-#### Version 2.0
+<p align="center">
+:open_file_folder:<strong>For releases click <a href="https://github.com/emimontesdeoca/FTPDownloader/releases">here</a>.</strong>
+</p>
 
-1. Support for filename/directory name with spaces (this was on the 1.0 but found a bug where sometimes it was not working as intended).
-2. Creates a folder with the ftp path.
-3. Creates a log file with all the downloads.
-4. Fixes and improvements.
-5. Now the app closes after the download.
+## Contributing
 
-Go to [releases](https://github.com/emimontesdeoca/FtpDownloader/releases) and grab it!
+As a developer, if you feel like helping, any contribution is welcome.
 
-## Introduction
-
-As the title show, this application basically reads the introduced FTP path with its username and password, and then starts to download from there to every single subdirectory found.
-
-The way it works is pretty simple, it makes a call to check and retrieve a list of current files/directorys of a certain ftp path, then downloads all the files, and then creates a folder. When the folder is created, it checks again for files and directories, this will do it until there is no more directories inside directories.
-
-## Important
-
-1. The credentials must have enough rights to download from the FTP server.
-2. The download path has to have FULL rights.
-
-## Questions and issues
-
-You can use the github issue tracker for bug reports, feature requests, questions.
+And as user, if youy have any bug, issue, feature request or question, feel free to open a [ticket issue](https://github.com/emimontesdeoca/FTPDownloader/issues).
 
 ## License
 
