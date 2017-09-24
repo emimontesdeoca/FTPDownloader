@@ -14,7 +14,7 @@ namespace FtpDownloader.Business
         /// </summary>
         /// <param name="filepath">Path to create the folder.</param>
         /// <param name="directoryname">Directory name.</param>
-        public void CreateDirectory(string filepath, string directoryname)
+        public async Task CreateDirectory(string filepath, string directoryname)
         {
             Directory.CreateDirectory(filepath + directoryname);
         }

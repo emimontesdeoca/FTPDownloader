@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="Business\FTP.cs" />
     <Compile Include="Business\Local.cs" />
-    <Compile Include="Business\Log.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>

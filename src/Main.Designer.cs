@@ -41,24 +41,23 @@
             this.btn_selectpath = new System.Windows.Forms.Button();
             this.btn_download = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.combobox_ftpserver = new System.Windows.Forms.ComboBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox_status = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.textbox_serverpath = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btn_testconnection
             // 
-            this.btn_testconnection.Location = new System.Drawing.Point(133, 145);
+            this.btn_testconnection.Location = new System.Drawing.Point(199, 118);
             this.btn_testconnection.Name = "btn_testconnection";
-            this.btn_testconnection.Size = new System.Drawing.Size(107, 21);
+            this.btn_testconnection.Size = new System.Drawing.Size(45, 21);
             this.btn_testconnection.TabIndex = 0;
-            this.btn_testconnection.Text = "Test connection";
+            this.btn_testconnection.Text = "Test ";
             this.btn_testconnection.UseVisualStyleBackColor = true;
             this.btn_testconnection.Click += new System.EventHandler(this.btn_testconnection_Click);
             // 
@@ -93,7 +92,7 @@
             // 
             this.textbox_password.Location = new System.Drawing.Point(9, 119);
             this.textbox_password.Name = "textbox_password";
-            this.textbox_password.Size = new System.Drawing.Size(235, 20);
+            this.textbox_password.Size = new System.Drawing.Size(184, 20);
             this.textbox_password.TabIndex = 6;
             this.textbox_password.UseSystemPasswordChar = true;
             // 
@@ -109,7 +108,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 262);
+            this.progressBar1.Location = new System.Drawing.Point(12, 242);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(250, 20);
             this.progressBar1.TabIndex = 7;
@@ -134,7 +133,7 @@
             // btn_selectpath
             // 
             this.btn_selectpath.Enabled = false;
-            this.btn_selectpath.Location = new System.Drawing.Point(214, 30);
+            this.btn_selectpath.Location = new System.Drawing.Point(214, 31);
             this.btn_selectpath.Name = "btn_selectpath";
             this.btn_selectpath.Size = new System.Drawing.Size(30, 24);
             this.btn_selectpath.TabIndex = 10;
@@ -144,7 +143,7 @@
             // btn_download
             // 
             this.btn_download.Enabled = false;
-            this.btn_download.Location = new System.Drawing.Point(126, 320);
+            this.btn_download.Location = new System.Drawing.Point(126, 300);
             this.btn_download.Name = "btn_download";
             this.btn_download.Size = new System.Drawing.Size(65, 20);
             this.btn_download.TabIndex = 11;
@@ -154,8 +153,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.combobox_ftpserver);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.textbox_serverpath);
             this.groupBox1.Controls.Add(this.btn_testconnection);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label2);
@@ -164,43 +162,26 @@
             this.groupBox1.Controls.Add(this.textbox_password);
             this.groupBox1.Location = new System.Drawing.Point(12, 11);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(250, 175);
+            this.groupBox1.Size = new System.Drawing.Size(250, 155);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Credentials";
             // 
-            // combobox_ftpserver
+            // textBox_status
             // 
-            this.combobox_ftpserver.FormattingEnabled = true;
-            this.combobox_ftpserver.Location = new System.Drawing.Point(9, 33);
-            this.combobox_ftpserver.Name = "combobox_ftpserver";
-            this.combobox_ftpserver.Size = new System.Drawing.Size(235, 21);
-            this.combobox_ftpserver.TabIndex = 15;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(9, 145);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(109, 21);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Save credentials";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Enabled = false;
-            this.textBox1.Location = new System.Drawing.Point(12, 291);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(250, 20);
-            this.textBox1.TabIndex = 13;
-            this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBox_status.Enabled = false;
+            this.textBox_status.Location = new System.Drawing.Point(12, 271);
+            this.textBox_status.Name = "textBox_status";
+            this.textBox_status.Size = new System.Drawing.Size(250, 20);
+            this.textBox_status.TabIndex = 13;
+            this.textBox_status.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.textbox_selectedpath);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.btn_selectpath);
-            this.groupBox2.Location = new System.Drawing.Point(12, 192);
+            this.groupBox2.Location = new System.Drawing.Point(12, 172);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(250, 64);
             this.groupBox2.TabIndex = 14;
@@ -210,7 +191,7 @@
             // button2
             // 
             this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(197, 320);
+            this.button2.Location = new System.Drawing.Point(197, 300);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(65, 20);
             this.button2.TabIndex = 15;
@@ -220,7 +201,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 347);
+            this.label5.Location = new System.Drawing.Point(9, 327);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(114, 13);
             this.label5.TabIndex = 16;
@@ -229,7 +210,7 @@
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(224, 347);
+            this.linkLabel1.Location = new System.Drawing.Point(224, 327);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(38, 13);
             this.linkLabel1.TabIndex = 17;
@@ -237,17 +218,24 @@
             this.linkLabel1.Text = "Github";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // textbox_serverpath
+            // 
+            this.textbox_serverpath.Location = new System.Drawing.Point(9, 33);
+            this.textbox_serverpath.Name = "textbox_serverpath";
+            this.textbox_serverpath.Size = new System.Drawing.Size(235, 20);
+            this.textbox_serverpath.TabIndex = 8;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(274, 369);
+            this.ClientSize = new System.Drawing.Size(274, 347);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textBox_status);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btn_download);
             this.Controls.Add(this.progressBar1);
@@ -280,13 +268,12 @@
         private System.Windows.Forms.Button btn_selectpath;
         private System.Windows.Forms.Button btn_download;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox_status;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.ComboBox combobox_ftpserver;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.TextBox textbox_serverpath;
     }
 }
 

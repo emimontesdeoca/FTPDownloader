@@ -24,9 +24,16 @@ namespace FtpDownloader
 
         private void Main_Load(object sender, EventArgs e)
         {
+            MaximizeBox = false;
+
             object o = Properties.Resources.ResourceManager.GetObject("folderjpg");
             btn_selectpath.Image = (Image)o;
             btn_selectpath.ImageAlign = ContentAlignment.MiddleCenter;
+            textBox_status.Text = "Waiting for credentials...";
+
+            textbox_serverpath.Text = "files.000webhost.com";
+            textbox_username.Text = "remontesdeoc";
+            textbox_password.Text = "pelotudo1337";
         }
 
         #region BUTTON CONTROL
@@ -38,39 +45,50 @@ namespace FtpDownloader
         /// <param name="e"></param>
         private async void btn_testconnection_Click(object sender, EventArgs e)
         {
+            await doTestConnection();
+
+        }
+
+        private async Task doTestConnection()
+        {
             /// Try to connect to the FTP.
             try
             {
+                btn_testconnection.Enabled = false;
+
+                /// Save the textboxes so it doesnt change after the test button is pushed.
+                textbox_serverpath.Enabled = false;
+                textbox_password.Enabled = false;
+                textbox_username.Enabled = false;
+
+                textBox_status.Text = "Connecting...";
+
                 /// Corrects the input for ftpserver.
-                if (combobox_ftpserver.Text.ToString().Substring(combobox_ftpserver.Text.ToString().Count() - 1, 1) != "/")
+                if (textbox_serverpath.Text.ToString().Substring(textbox_serverpath.Text.ToString().Count() - 1, 1) != "/")
                 {
-                    combobox_ftpserver.Text += "/";
+                    textbox_serverpath.Text += "/";
                 }
                 /// Corrects the input for ftpserver.
-                if (combobox_ftpserver.Text.ToString().Substring(0, 6) != "ftp://")
+                if (textbox_serverpath.Text.ToString().Substring(0, 6) != "ftp://")
                 {
-                    string newstring = "ftp://" + combobox_ftpserver.Text.ToString();
-                    combobox_ftpserver.Text = newstring;
+                    string newstring = "ftp://" + textbox_serverpath.Text.ToString();
+                    textbox_serverpath.Text = newstring;
                 }
 
                 /// If successfully show some messagebox and enable buttons for further steps.
-                await new Business.FTP().TestConnection(combobox_ftpserver.Text.ToString(), textbox_username.Text, textbox_password.Text, true);
+                await new Business.FTP().TestConnection(textbox_serverpath.Text.ToString(), textbox_username.Text, textbox_password.Text, true);
 
-                MessageBox.Show("Connection successfully.");
+                textBox_status.Text = "Connection successfully!";
                 btn_selectpath.Enabled = true;
-
-                /// Save the textboxes so it doesnt change after the test button is pushed.
-                combobox_ftpserver.Enabled = false;
-                textbox_password.Enabled = false;
-                textbox_username.Enabled = false;
 
                 /// Disable this button.
                 btn_testconnection.Enabled = false;
             }
             catch (Exception)
             {
-                MessageBox.Show("Error connecting to FTP.");
+                textBox_status.Text = "Error connecting to FTP!";
             }
+
         }
 
         /// <summary>
@@ -108,7 +126,7 @@ namespace FtpDownloader
                 await DoDownload();
                 token.Cancel();
                 isFinishedDownload = true;
-
+                break;
             }
         }
 
@@ -124,18 +142,18 @@ namespace FtpDownloader
 
                 string newdirectory = "";
                 /// Corrects the input for ftpserver.
-                if (combobox_ftpserver.Text.ToString().Substring(combobox_ftpserver.Text.ToString().Count() - 1, 1) == "/")
+                if (textbox_serverpath.Text.ToString().Substring(textbox_serverpath.Text.ToString().Count() - 1, 1) == "/")
                 {
-                    newdirectory = combobox_ftpserver.Text.ToString().Remove(combobox_ftpserver.Text.ToString().Length - 1, 1);
+                    newdirectory = textbox_serverpath.Text.ToString().Remove(textbox_serverpath.Text.ToString().Length - 1, 1);
                 }
                 /// Corrects the input for ftpserver.
-                if (combobox_ftpserver.Text.ToString().Substring(0, 6) == "ftp://")
+                if (textbox_serverpath.Text.ToString().Substring(0, 6) == "ftp://")
                 {
                     newdirectory = newdirectory.Remove(0, 6);
                 }
                 localfilepath = textbox_selectedpath.Text + newdirectory + "\\";
-                new Business.Local().CreateDirectory(textbox_selectedpath.Text, newdirectory);
-                await DownloadInside(combobox_ftpserver.Text.ToString(), textbox_selectedpath.Text + newdirectory + "\\");
+                await new Business.Local().CreateDirectory(textbox_selectedpath.Text, newdirectory);
+                await DownloadInside(textbox_serverpath.Text.ToString(), textbox_selectedpath.Text + newdirectory + "\\");
 
                 /// End progress bar.
                 progressBar1.Value = progressBar1.Maximum;
@@ -165,7 +183,7 @@ namespace FtpDownloader
             btn_download.Enabled = false;
 
             /// Enable FTP buttons
-            combobox_ftpserver.Enabled = false;
+            textbox_serverpath.Enabled = false;
             textbox_password.Enabled = false;
             textbox_username.Enabled = false;
 
@@ -174,7 +192,8 @@ namespace FtpDownloader
             List<string> directoryfiles = new List<string>();
             /// Get the struct list of files with its type ("d" for directory || "-" for file).
             /// This is going to download the files first since it is ordered to do it!
-            List<Business.FTP.Ftplist> ftpdirectory = new Business.FTP().GetFileList(path, textbox_username.Text, textbox_password.Text).OrderBy(o => o.Type).ToList();
+            List<Business.FTP.Ftplist> ftpdirectory = await new Business.FTP().GetFileList(path, textbox_username.Text, textbox_password.Text);
+            ftpdirectory.OrderBy(o => o.Type).ToList();
             /// Since we know how many files there are, lets increment the ProgressBar.
             progressBar1.Maximum = progressBar1.Maximum + ftpdirectory.Count;
 
@@ -184,12 +203,12 @@ namespace FtpDownloader
                 if (item.Type == "d" && !Directory.Exists(localpath + item.Filename + "\\"))
                 {
                     /// If there is a directory, lets create it.
-                    new Business.Local().CreateDirectory(localpath, item.Filename);
-                    new Business.Log().WriteLog(path, localpath + item.Filename, localfilepath);
+                    await new Business.Local().CreateDirectory(localpath, item.Filename);
 
                     /// Now lets get the filetree of the directory that we just created (filetree in the FTP not in the PATH).
                     /// This is going to download the files first since it is ordered to do it!
-                    List<Business.FTP.Ftplist> newftpdirectory = new Business.FTP().GetFileList(path + item.Filename + "/", textbox_username.Text, textbox_password.Text).OrderBy(o => o.Type).ToList();
+                    List<Business.FTP.Ftplist> newftpdirectory = await new Business.FTP().GetFileList(path + item.Filename + "/", textbox_username.Text, textbox_password.Text);
+                    newftpdirectory.OrderBy(o => o.Type).ToList();
 
                     /// Since we know the filetree now, lets download the files and create the folders.
                     foreach (Business.FTP.Ftplist newitem in newftpdirectory)
@@ -212,7 +231,7 @@ namespace FtpDownloader
                             string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(newitem.Filename).Replace("+", "%20");
 
                             /// Download it.
-                            new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename, localfilepath);
+                            await new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename, localfilepath);
                         }
                         /// Add 1 to progress bar.
                         try
@@ -237,7 +256,7 @@ namespace FtpDownloader
                     /// Encode it to URL for the FTP download.
                     string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(item.Filename).Replace("+", "%20");
                     /// Download it.
-                    new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename, localfilepath);
+                    await new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename, localfilepath);
                 }
                 /// Add 1 to progress bar.
                 try
@@ -255,7 +274,7 @@ namespace FtpDownloader
             btn_download.Enabled = true;
 
             /// Enable FTP buttons
-            combobox_ftpserver.Enabled = true;
+            textbox_serverpath.Enabled = true;
             textbox_password.Enabled = true;
             textbox_username.Enabled = true;
         }

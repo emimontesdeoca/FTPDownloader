@@ -44,7 +44,7 @@ namespace FtpDownloader.Business
         /// <param name="password">FTP Password.</param>
         /// <param name="keepAlive">Bool to close the connection after done, true by default.</param>
         /// <returns></returns>
-        public FtpWebRequest CreateFtpWebRequest(string FTPDirectoryPath, string username, string password, bool keepAlive = false)
+        public async Task<FtpWebRequest> CreateFtpWebRequest(string FTPDirectoryPath, string username, string password, bool keepAlive = false)
         {
             /// Clean the request, just in case.
             request = null;
@@ -73,13 +73,13 @@ namespace FtpDownloader.Business
             {
                 request = null;
                 /// Creates FtpWebRequest.
-                request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
+                request = await CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
 
                 /// Method is set to ListDirectoryDetails.
                 request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
                 /// Make the call to the FTP.
-                request.GetResponse();
+                await request.GetResponseAsync();
             }
             catch
             {
@@ -94,13 +94,13 @@ namespace FtpDownloader.Business
         /// <param name="s">Settings.</param>
         /// <param name="keepAlive">Request value, keep it TRUE.</param>
         /// <returns></returns>
-        public FtpWebResponse GetDirectoryList(string FtpFolderPath, string FtpUsername, string FtpPassword, bool keepAlive = false)
+        public async Task<FtpWebResponse> GetDirectoryList(string FtpFolderPath, string FtpUsername, string FtpPassword, bool keepAlive = false)
         {
             /// Creates FtpWebRequest.
 
             request = null;
 
-            request = CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
+            request = await CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
 
             /// Method is set to ListDirectoryDetails.
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -131,7 +131,7 @@ namespace FtpDownloader.Business
         /// <param name="DownloadFolderPath">Local download path.</param>
         /// <param name="UrlEncodedTorrent">Encoded URL, necessary to download.</param>
         /// <param name="filename">Filename for creating the file with same name(not encoded).</param>
-        public void DownloadFile(string FtpFolderPath, string FtpUsername, string FtpPassword, string DownloadFolderPath, string UrlEncodedTorrent, string filename, string rootDownloadFolderPath)
+        public async Task DownloadFile(string FtpFolderPath, string FtpUsername, string FtpPassword, string DownloadFolderPath, string UrlEncodedTorrent, string filename, string rootDownloadFolderPath)
         {
             /// Filestream necessary values.
             int bytesRead = 0;
@@ -141,7 +141,7 @@ namespace FtpDownloader.Business
             request = null;
 
             /// Creates request and assigns it to the request.
-            request = CreateFtpWebRequest(FtpFolderPath + UrlEncodedTorrent, FtpUsername, FtpPassword, true);
+            request = await CreateFtpWebRequest(FtpFolderPath + UrlEncodedTorrent, FtpUsername, FtpPassword, true);
             request.Method = WebRequestMethods.Ftp.DownloadFile;
 
             try
@@ -164,8 +164,6 @@ namespace FtpDownloader.Business
                 }
                 /// Close the file.
                 fileStream.Close();
-                /// Create log
-                new Business.Log().WriteLog(FtpFolderPath + UrlEncodedTorrent, DownloadFolderPath + filename, rootDownloadFolderPath);
             }
             catch (Exception e)
             {
@@ -182,7 +180,7 @@ namespace FtpDownloader.Business
         /// </summary>
         /// <param name="s">Settings.</param>
         /// <returns></returns>
-        public List<Ftplist> GetFileList(string FtpFolderPath, string FtpUsername, string FtpPassword)
+        public async Task<List<Ftplist>> GetFileList(string FtpFolderPath, string FtpUsername, string FtpPassword)
         {
             /// Set the sourceFileList to return, is a list of ftplist, the struct generated at the beginning.
             List<Ftplist> sourceFileList = new List<Ftplist>();
@@ -190,7 +188,7 @@ namespace FtpDownloader.Business
             try
             {
                 /// Build the response and return it to this method.
-                FtpWebResponse sourceResponse = GetDirectoryList(FtpFolderPath, FtpUsername, FtpPassword, true);
+                FtpWebResponse sourceResponse = await GetDirectoryList(FtpFolderPath, FtpUsername, FtpPassword, true);
 
                 /// Do the call to the FTP.
                 using (Stream responseStream = sourceResponse.GetResponseStream())
