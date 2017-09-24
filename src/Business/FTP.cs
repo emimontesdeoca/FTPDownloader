@@ -54,8 +54,6 @@ namespace FtpDownloader.Business
 
             request.Proxy = null;
 
-
-
             request.UsePassive = true;
             request.UseBinary = true;
             request.KeepAlive = true;
@@ -81,14 +79,32 @@ namespace FtpDownloader.Business
                 request = (FtpWebRequest)await CreateFtpWebRequest(FtpFolderPath, FtpUsername, FtpPassword, true);
                 u = FtpUsername;
                 p = FtpPassword;
+
+                request.UsePassive = true;
+                request.UseBinary = true;
+                request.KeepAlive = true;
+
                 /// Method is set to ListDirectoryDetails.
                 request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
-                /// Make the call to the FTP.
-                await request.GetResponseAsync();
+                do
+                {
+                    try
+                    {
+                        /// Make the call to the FTP.
+                        await Task.Run(() => request.GetResponseAsync());
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                } while (true);
+
             }
-            catch
+            catch (Exception e)
             {
+                string a = e.Message;
                 throw new Exception();
             }
 

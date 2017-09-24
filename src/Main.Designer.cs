@@ -46,18 +46,20 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btn_cancel = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // btn_testconnection
             // 
-            this.btn_testconnection.Location = new System.Drawing.Point(199, 118);
+            this.btn_testconnection.Location = new System.Drawing.Point(214, 117);
             this.btn_testconnection.Name = "btn_testconnection";
-            this.btn_testconnection.Size = new System.Drawing.Size(45, 21);
+            this.btn_testconnection.Size = new System.Drawing.Size(30, 24);
             this.btn_testconnection.TabIndex = 0;
-            this.btn_testconnection.Text = "Test ";
             this.btn_testconnection.UseVisualStyleBackColor = true;
             this.btn_testconnection.Click += new System.EventHandler(this.btn_testconnection_Click);
             // 
@@ -92,7 +94,7 @@
             // 
             this.textbox_password.Location = new System.Drawing.Point(9, 119);
             this.textbox_password.Name = "textbox_password";
-            this.textbox_password.Size = new System.Drawing.Size(184, 20);
+            this.textbox_password.Size = new System.Drawing.Size(199, 20);
             this.textbox_password.TabIndex = 6;
             this.textbox_password.UseSystemPasswordChar = true;
             // 
@@ -118,7 +120,7 @@
             this.textbox_selectedpath.Enabled = false;
             this.textbox_selectedpath.Location = new System.Drawing.Point(6, 33);
             this.textbox_selectedpath.Name = "textbox_selectedpath";
-            this.textbox_selectedpath.Size = new System.Drawing.Size(199, 20);
+            this.textbox_selectedpath.Size = new System.Drawing.Size(202, 20);
             this.textbox_selectedpath.TabIndex = 9;
             // 
             // label4
@@ -209,30 +211,45 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 327);
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(9, 331);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(114, 13);
+            this.label5.Size = new System.Drawing.Size(134, 15);
             this.label5.TabIndex = 16;
             this.label5.Text = "Emiliano Montesdeoca";
             // 
-            // linkLabel1
+            // pictureBox2
             // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(224, 327);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(38, 13);
-            this.linkLabel1.TabIndex = 17;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "Github";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.pictureBox2.ErrorImage = ((System.Drawing.Image)(resources.GetObject("pictureBox2.ErrorImage")));
+            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pictureBox2.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox2.InitialImage")));
+            this.pictureBox2.Location = new System.Drawing.Point(216, 327);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(20, 20);
+            this.pictureBox2.TabIndex = 19;
+            this.pictureBox2.TabStop = false;
+            this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.ErrorImage = global::FtpDownloader.Properties.Resources.github;
+            this.pictureBox1.Image = global::FtpDownloader.Properties.Resources.github;
+            this.pictureBox1.InitialImage = global::FtpDownloader.Properties.Resources.github;
+            this.pictureBox1.Location = new System.Drawing.Point(242, 327);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(20, 20);
+            this.pictureBox1.TabIndex = 18;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(274, 347);
-            this.Controls.Add(this.linkLabel1);
+            this.ClientSize = new System.Drawing.Size(274, 355);
+            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.btn_cancel);
             this.Controls.Add(this.groupBox2);
@@ -250,6 +267,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -273,8 +292,9 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btn_cancel;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.TextBox textbox_serverpath;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox2;
     }
 }
 

@@ -86,6 +86,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\icon.ico" />
+    <None Include="Resources\ftp.png" />
+    <None Include="Resources\test.png" />
+    <None Include="Resources\twitter.png" />
+    <None Include="Resources\github.png" />
     <None Include="Resources\folderjpg.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
