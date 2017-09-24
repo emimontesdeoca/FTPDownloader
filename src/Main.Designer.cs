@@ -41,12 +41,12 @@
             this.btn_selectpath = new System.Windows.Forms.Button();
             this.btn_download = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textbox_serverpath = new System.Windows.Forms.TextBox();
             this.textBox_status = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btn_cancel = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.textbox_serverpath = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -167,6 +167,13 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Credentials";
             // 
+            // textbox_serverpath
+            // 
+            this.textbox_serverpath.Location = new System.Drawing.Point(9, 33);
+            this.textbox_serverpath.Name = "textbox_serverpath";
+            this.textbox_serverpath.Size = new System.Drawing.Size(235, 20);
+            this.textbox_serverpath.TabIndex = 8;
+            // 
             // textBox_status
             // 
             this.textBox_status.Enabled = false;
@@ -188,15 +195,16 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Destination";
             // 
-            // button2
+            // btn_cancel
             // 
-            this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(197, 300);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(65, 20);
-            this.button2.TabIndex = 15;
-            this.button2.Text = "Cancel";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btn_cancel.Enabled = false;
+            this.btn_cancel.Location = new System.Drawing.Point(197, 300);
+            this.btn_cancel.Name = "btn_cancel";
+            this.btn_cancel.Size = new System.Drawing.Size(65, 20);
+            this.btn_cancel.TabIndex = 15;
+            this.btn_cancel.Text = "Cancel";
+            this.btn_cancel.UseVisualStyleBackColor = true;
+            this.btn_cancel.Click += new System.EventHandler(this.btn_cancel_Click);
             // 
             // label5
             // 
@@ -218,13 +226,6 @@
             this.linkLabel1.Text = "Github";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
-            // textbox_serverpath
-            // 
-            this.textbox_serverpath.Location = new System.Drawing.Point(9, 33);
-            this.textbox_serverpath.Name = "textbox_serverpath";
-            this.textbox_serverpath.Size = new System.Drawing.Size(235, 20);
-            this.textbox_serverpath.TabIndex = 8;
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -233,7 +234,7 @@
             this.ClientSize = new System.Drawing.Size(274, 347);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btn_cancel);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.textBox_status);
             this.Controls.Add(this.groupBox1);
@@ -270,7 +271,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox textBox_status;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btn_cancel;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.TextBox textbox_serverpath;

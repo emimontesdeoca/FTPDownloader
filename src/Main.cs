@@ -17,6 +17,7 @@ namespace FtpDownloader
         public string localfilepath { get; set; }
         public CancellationTokenSource token = new CancellationTokenSource();
         public static bool isFinishedDownload { get; set; }
+
         public Main()
         {
             InitializeComponent();
@@ -31,9 +32,7 @@ namespace FtpDownloader
             btn_selectpath.ImageAlign = ContentAlignment.MiddleCenter;
             textBox_status.Text = "Waiting for credentials...";
 
-            textbox_serverpath.Text = "files.000webhost.com";
-            textbox_username.Text = "remontesdeoc";
-            textbox_password.Text = "pelotudo1337";
+
         }
 
         #region BUTTON CONTROL
@@ -76,7 +75,7 @@ namespace FtpDownloader
                 }
 
                 /// If successfully show some messagebox and enable buttons for further steps.
-                await new Business.FTP().TestConnection(textbox_serverpath.Text.ToString(), textbox_username.Text, textbox_password.Text, true);
+                await Task.Run(() => new Business.FTP().TestConnection(textbox_serverpath.Text.ToString(), textbox_username.Text, textbox_password.Text, true));
 
                 textBox_status.Text = "Connection successfully!";
                 btn_selectpath.Enabled = true;
@@ -110,7 +109,7 @@ namespace FtpDownloader
                 /// Enable the download button since we have a path.
                 btn_download.Enabled = true;
                 /// Set the text to download, this is because we change the text in next steps.
-                btn_download.Text = "Download";
+                textBox_status.Text = "Ready to download!";
             }
         }
 
@@ -121,19 +120,44 @@ namespace FtpDownloader
         /// <param name="e"></param>
         private async void btn_download_Click(object sender, EventArgs e)
         {
+
+            this.Invoke(new Action(() => btn_cancel.Enabled = true));
+            this.Invoke(new Action(() => btn_selectpath.Enabled = false));
             while (!token.IsCancellationRequested || isFinishedDownload)
             {
                 await DoDownload();
+
+                btn_cancel.Enabled = false;
                 token.Cancel();
-                isFinishedDownload = true;
                 break;
+            }
+            /// End progress bar.
+            this.Invoke(new Action(() => progressBar1.Value = progressBar1.Maximum));
+            this.Invoke(new Action(() => btn_download.Enabled = false));
+
+            if (isFinishedDownload && !token.IsCancellationRequested)
+            {
+                /// Disable forms again and some styling.
+                this.Invoke(new Action(() => btn_download.Enabled = true));
+
+                /// Enable FTP buttons
+                this.Invoke(new Action(() => textbox_serverpath.Enabled = true));
+                this.Invoke(new Action(() => textbox_password.Enabled = true));
+                this.Invoke(new Action(() => textbox_username.Enabled = true));
+
+                this.Invoke(new Action(() => textbox_serverpath.Text = ""));
+                this.Invoke(new Action(() => textbox_password.Text = ""));
+                this.Invoke(new Action(() => textbox_username.Text = ""));
+
+                /// If done, show something bro.
+                this.Invoke(new Action(() => textBox_status.Text = "Download completed!"));
             }
         }
 
         private async Task DoDownload()
         {
             /// Set ProgrssBar values and maximum.
-            progressBar1.Maximum = 100;
+            progressBar1.Maximum = 250;
             progressBar1.Value = 0;
 
             /// Do the download stuff.
@@ -152,19 +176,29 @@ namespace FtpDownloader
                     newdirectory = newdirectory.Remove(0, 6);
                 }
                 localfilepath = textbox_selectedpath.Text + newdirectory + "\\";
-                await new Business.Local().CreateDirectory(textbox_selectedpath.Text, newdirectory);
+                try
+                {
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
                 await DownloadInside(textbox_serverpath.Text.ToString(), textbox_selectedpath.Text + newdirectory + "\\");
 
-                /// End progress bar.
-                progressBar1.Value = progressBar1.Maximum;
 
-                /// If done, show something bro.
-                MessageBox.Show("Download completed!");
+
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                progressBar1.Value = 0;
-                MessageBox.Show("FTP error, retry again!");
+                if (token.IsCancellationRequested)
+                {
+                    textBox_status.Text = "Download canceled!";
+                }
+
+                string a = e.Message.ToString();
             }
         }
 
@@ -179,6 +213,7 @@ namespace FtpDownloader
         /// <param name="localpath">Path to local.</param>
         private async Task DownloadInside(string path, string localpath)
         {
+            isFinishedDownload = false;
             /// Disable forms again and some styling.
             btn_download.Enabled = false;
 
@@ -195,7 +230,7 @@ namespace FtpDownloader
             List<Business.FTP.Ftplist> ftpdirectory = await new Business.FTP().GetFileList(path, textbox_username.Text, textbox_password.Text);
             ftpdirectory.OrderBy(o => o.Type).ToList();
             /// Since we know how many files there are, lets increment the ProgressBar.
-            progressBar1.Maximum = progressBar1.Maximum + ftpdirectory.Count;
+            //this.Invoke(new Action(() => this.progressBar1.Value = this.progressBar1.Maximum + ftpdirectory.Count));
 
             foreach (Business.FTP.Ftplist item in ftpdirectory)
             {
@@ -208,7 +243,7 @@ namespace FtpDownloader
                     /// Now lets get the filetree of the directory that we just created (filetree in the FTP not in the PATH).
                     /// This is going to download the files first since it is ordered to do it!
                     List<Business.FTP.Ftplist> newftpdirectory = await new Business.FTP().GetFileList(path + item.Filename + "/", textbox_username.Text, textbox_password.Text);
-                    newftpdirectory.OrderBy(o => o.Type).ToList();
+                    await Task.Run(() => newftpdirectory.OrderBy(o => o.Type).ToList());
 
                     /// Since we know the filetree now, lets download the files and create the folders.
                     foreach (Business.FTP.Ftplist newitem in newftpdirectory)
@@ -216,8 +251,9 @@ namespace FtpDownloader
                         /// If the file/directory is a directory, and it does not exist in our PATH.
                         if (newitem.Type == "d" && !Directory.Exists(localpath + item.Filename + "\\" + newitem.Filename + "\\"))
                         {
+                            this.Invoke(new Action(() => this.textBox_status.Text = path + item.Filename));
                             /// It calls this same method to do it again but giving it this current FTP path and LOCAL path.
-                            await DownloadInside(path + item.Filename + "/", localpath + item.Filename + "\\");
+                            await Task.Run(() => DownloadInside(path + item.Filename + "/", localpath + item.Filename + "\\"));
                         }
                         /// If it is a file and already exist
                         else if (File.Exists(localpath + item.Filename + "\\" + newitem.Filename))
@@ -228,20 +264,21 @@ namespace FtpDownloader
                         else if (!Directory.Exists(localpath + item.Filename + "\\" + newitem.Filename + "\\") && !File.Exists(localpath + item.Filename + "\\" + newitem.Filename))
                         {
                             /// Encode it to URL for the FTP download.
-                            string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(newitem.Filename).Replace("+", "%20");
+                            string UrlEncodedFilename = await Task.Run(() => System.Net.WebUtility.UrlEncode(newitem.Filename).Replace("+", "%20"));
 
                             /// Download it.
-                            await new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename, localfilepath);
+                            await Task.Run(() => new Business.FTP().DownloadFile(path + item.Filename + "/", textbox_username.Text, textbox_password.Text, localpath + item.Filename + "\\", UrlEncodedFilename, newitem.Filename, localfilepath));
+                            this.Invoke(new Action(() => this.textBox_status.Text = path + item.Filename + "/" + newitem.Filename));
                         }
                         /// Add 1 to progress bar.
                         try
                         {
-                            progressBar1.Increment(1);
+                            this.Invoke(new Action(() => this.progressBar1.Increment(1)));
                         }
                         catch (Exception)
                         {
                             /// If the increment is greater thant the maximun, just keep it 99%.
-                            progressBar1.Value = progressBar1.Maximum - 1;
+                            this.Invoke(new Action(() => this.progressBar1.Value = progressBar1.Maximum - 1));
                         }
                     }
                 }
@@ -254,34 +291,56 @@ namespace FtpDownloader
                 else
                 {
                     /// Encode it to URL for the FTP download.
-                    string UrlEncodedFilename = System.Net.WebUtility.UrlEncode(item.Filename).Replace("+", "%20");
+                    string UrlEncodedFilename = await Task.Run(() => System.Net.WebUtility.UrlEncode(item.Filename).Replace("+", "%20"));
                     /// Download it.
-                    await new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename, localfilepath);
+                    try
+                    {
+                        await Task.Run(() => new Business.FTP().DownloadFile(path, textbox_username.Text, textbox_password.Text, localpath, UrlEncodedFilename, item.Filename, localfilepath));
+
+                    }
+                    catch (Exception)
+                    {
+
+                    }
                 }
                 /// Add 1 to progress bar.
                 try
                 {
-                    progressBar1.Increment(1);
+                    this.Invoke(new Action(() => this.progressBar1.Increment(1)));
                 }
                 catch (Exception)
                 {
                     /// If the increment is greater thant the maximun, just keep it 99%.
-                    progressBar1.Value = progressBar1.Maximum - 1;
+                    this.Invoke(new Action(() => this.progressBar1.Value = progressBar1.Maximum - 1));
                 }
+                
             }
-
-            /// Disable forms again and some styling.
-            btn_download.Enabled = true;
-
-            /// Enable FTP buttons
-            textbox_serverpath.Enabled = true;
-            textbox_password.Enabled = true;
-            textbox_username.Enabled = true;
+            isFinishedDownload = true;
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/emimontesdeoca/FTPDownloader");
+        }
+
+        private async void btn_cancel_Click(object sender, EventArgs e)
+        {
+            this.Invoke(new Action(() => token.Cancel()));
+
+            this.Invoke(new Action(() => btn_cancel.Enabled = false));
+
+            this.Invoke(new Action(() => textbox_serverpath.Enabled = true));
+            this.Invoke(new Action(() => textbox_password.Enabled = true));
+            this.Invoke(new Action(() => textbox_username.Enabled = true));
+            this.Invoke(new Action(() => btn_selectpath.Enabled = false));
+
+            this.Invoke(new Action(() => textbox_serverpath.Text = ""));
+            this.Invoke(new Action(() => textbox_password.Text = ""));
+            this.Invoke(new Action(() => textbox_username.Text = ""));
+            this.Invoke(new Action(() => textbox_selectedpath.Text = ""));
+
+            this.Invoke(new Action(() => textBox_status.Text = "Download canceled!"));
+            this.Invoke(new Action(() => progressBar1.Value = progressBar1.Maximum));
         }
     }
 

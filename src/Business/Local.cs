@@ -16,7 +16,15 @@ namespace FtpDownloader.Business
         /// <param name="directoryname">Directory name.</param>
         public async Task CreateDirectory(string filepath, string directoryname)
         {
-            Directory.CreateDirectory(filepath + directoryname);
+            if (Directory.Exists(filepath + directoryname))
+            {
+                throw new Exception();
+            }
+            else
+            {
+                await Task.Run(() => Directory.CreateDirectory(filepath + directoryname));
+            }
+
         }
     }
 }
